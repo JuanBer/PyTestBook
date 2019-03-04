@@ -88,11 +88,23 @@ def author_file_json(tmpdir_factory):
         'Brian': {'City': 'Portland'},
         'Luciano': {'City': 'Sau Paulo'}
     }
-
     file = tmpdir_factory.mktemp('data').join('author_file.json')
     print('file:{}'.format(str(file)))
-
     with file.open('w') as f:
         json.dump(python_author_data, f)
-
     return file
+
+
+# This is a hook function
+def pytest_addoption(parser):
+    parser.addoption("--myopt", action="store_true", help="Some boolean option")
+    parser.addoption("--foo", action="store", default="bar", help="foo: bar or baz")
+
+@pytest.fixture()
+def foo(pytestconfig):
+    return pytestconfig.option.foo
+
+
+@pytest.fixture()
+def myopt(pytestconfig):
+    return pytestconfig.option.myopt
