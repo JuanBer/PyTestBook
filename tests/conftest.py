@@ -1,5 +1,6 @@
 import pytest
 import tasks
+import json
 from tasks import Task
 
 
@@ -16,7 +17,7 @@ def tasks_db_1(tmpdir):
     # Setup: start db
     tasks.start_tasks_db(str(tmpdir), 'tiny')
 
-    yield # this is were the testing happens
+    yield  # this is were the testing happens
 
     # Teardown: stop db
     tasks.stop_tasks_db()
@@ -41,7 +42,7 @@ def tasks_db(tasks_db_session):
 @pytest.fixture(scope='session')
 def tasks_just_a_few():
     """All summaries and owners are unique."""
-    return(
+    return (
         Task('Write some code', 'Brian', True),
         Task("Coode review Brian's code", 'Katie', False),
         Task('Fix what Brian did', 'Michelle', False)
@@ -51,7 +52,7 @@ def tasks_just_a_few():
 @pytest.fixture(scope='session')
 def tasks_mult_per_owner():
     """Several owners with several tasks each."""
-    return(
+    return (
         Task('Make a cookie', 'Raphael'),
         Task('Use an emoji', 'Raphael'),
         Task('Move to Berlin', 'Raphael'),
@@ -77,3 +78,21 @@ def db_with_multi_per_owner(tasks_db, tasks_mult_per_owner):
     """Connected db with 9 tasks, 3 owners, all with 3 tasks."""
     for t in tasks_mult_per_owner:
         tasks.add(t)
+
+
+@pytest.fixture(scope='module')
+def author_file_json(tmpdir_factory):
+    """Write some authors to a data file."""
+    python_author_data = {
+        'Ned': {'City': 'Boston'},
+        'Brian': {'City': 'Portland'},
+        'Luciano': {'City': 'Sau Paulo'}
+    }
+
+    file = tmpdir_factory.mktemp('data').join('author_file.json')
+    print('file:{}'.format(str(file)))
+
+    with file.open('w') as f:
+        json.dump(python_author_data, f)
+
+    return file
